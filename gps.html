@@ -1,0 +1,41 @@
+<div id="map"></div>
+<script>
+    const map = document.getElementById('map');
+    let watchId;
+
+    function scrollmap(position) {
+        const { latitude, longitude } = position.coords;
+        const location = encodeURIComponent(`${latitude},${longitude}`);
+        map.innerHTML = `<iframe title="Map showing your current location" width="700" height="300" src="https://maps.google.com/maps?q=${location}&amp;z=15&amp;output=embed"></iframe>`;
+    }
+
+    if (navigator.geolocation) {
+        map.textContent = 'Waiting for your location...';
+        watchId = navigator.geolocation.watchPosition(scrollmap, handleError);
+    } else {
+        map.textContent = 'Location is unavailable. Open this page over HTTPS or on localhost.';
+    }
+
+    function buttonClickHandler(){
+        if (watchId !== undefined) {
+            navigator.geolocation.clearWatch(watchId);
+        }
+    }
+
+    function handleError(error){
+        switch (error.code) {
+            case 1:
+                map.textContent = 'Location permission was denied.';
+                break;
+            case 2:
+                map.textContent = 'Your current location is unavailable.';
+                break;
+            case 3:
+                map.textContent = 'Getting your location timed out.';
+                break;
+            default:
+                map.textContent = 'Unable to get your location.';
+        }
+    }
+</script>
+<button onclick="buttonClickHandler()">Stop Watching</button>
